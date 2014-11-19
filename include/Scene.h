@@ -4,6 +4,7 @@
 #include <vector>
 #include "Primitive.h"
 
+
 class Scene {
 protected:
 	std::vector<Primitive*> _primitives;
@@ -14,7 +15,7 @@ public:
 	
 	void addPrimitive(Primitive* p);
 	
-	std::vector<Primitive*>& getPrimitives() { return _primitives; }
+	const std::vector<Primitive*>& primitives() const { return _primitives; }
 };
 
 

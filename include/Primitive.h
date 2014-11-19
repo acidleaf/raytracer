@@ -22,7 +22,7 @@ protected:
 	glm::vec3 _diffuse;
 	
 public:
-	void diffuse(glm::vec3& diffuse) { _diffuse = diffuse; }
+	void diffuse(glm::vec3 diffuse) { _diffuse = diffuse; }
 	glm::vec3 diffuse() { return _diffuse; }
 	
 };
@@ -40,7 +40,7 @@ public:
 	virtual ~Primitive() {}
 	
 	virtual HitTestResult intersect(Ray& ray, float& dist) const = 0;
-	virtual glm::vec3 getNormal() const = 0; 
+	virtual glm::vec3 getNormal(const glm::vec3& p) const = 0; 
 	
 	Material& material() { return _material; }
 	void setMaterial(Material& m) { _material = m; }
@@ -64,7 +64,7 @@ public:
 	
 	Sphere(glm::vec3 centre, float radius) : _centre(centre), _radius(radius) {}
 	HitTestResult intersect(Ray& ray, float& dist) const;
-	glm::vec3 getNormal() const;
+	glm::vec3 getNormal(const glm::vec3& p) const;
 };
 
 #endif

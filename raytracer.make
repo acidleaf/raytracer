@@ -71,6 +71,7 @@ endif
 
 OBJECTS := \
 	$(OBJDIR)/App.o \
+	$(OBJDIR)/Camera.o \
 	$(OBJDIR)/Display.o \
 	$(OBJDIR)/main.o \
 	$(OBJDIR)/Primitive.o \
@@ -141,6 +142,9 @@ $(GCH): $(PCH)
 endif
 
 $(OBJDIR)/App.o: src/App.cc
+	@echo $(notdir $<)
+	$(SILENT) $(CXX) $(CXXFLAGS) -o "$@" -c "$<"
+$(OBJDIR)/Camera.o: src/Camera.cc
 	@echo $(notdir $<)
 	$(SILENT) $(CXX) $(CXXFLAGS) -o "$@" -c "$<"
 $(OBJDIR)/Display.o: src/Display.cc

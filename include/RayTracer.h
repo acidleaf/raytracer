@@ -21,17 +21,20 @@ public:
 
 
 class Scene;
+class Camera;
 
 class RayTracer {
 protected:
 	GLuint _width, _height;
 	GLubyte* _resultData;
 	
+	void setPixel(GLuint x, GLuint y, glm::vec3 color);
+	
 public:
 	bool init(GLuint width, GLuint height);
 	void release();
 	
-	void render(const Scene& scene);
+	void render(const Scene& scene, const Camera& cam);
 	
 	const GLubyte* resultData() { return _resultData; }
 };

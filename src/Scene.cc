@@ -1,6 +1,7 @@
 #include "Scene.h"
 
 bool Scene::init() {
+	
 	return true;
 }
 
