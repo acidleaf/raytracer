@@ -72,12 +72,12 @@ endif
 OBJECTS := \
 	$(OBJDIR)/App.o \
 	$(OBJDIR)/Camera.o \
-	$(OBJDIR)/Display.o \
 	$(OBJDIR)/main.o \
 	$(OBJDIR)/Primitive.o \
 	$(OBJDIR)/RayTracer.o \
 	$(OBJDIR)/Scene.o \
 	$(OBJDIR)/ShaderSrc.o \
+	$(OBJDIR)/Stage.o \
 	$(OBJDIR)/Shader.o \
 	$(OBJDIR)/Surface.o \
 	$(OBJDIR)/Texture.o \
@@ -147,9 +147,6 @@ $(OBJDIR)/App.o: src/App.cc
 $(OBJDIR)/Camera.o: src/Camera.cc
 	@echo $(notdir $<)
 	$(SILENT) $(CXX) $(CXXFLAGS) -o "$@" -c "$<"
-$(OBJDIR)/Display.o: src/Display.cc
-	@echo $(notdir $<)
-	$(SILENT) $(CXX) $(CXXFLAGS) -o "$@" -c "$<"
 $(OBJDIR)/main.o: src/main.cc
 	@echo $(notdir $<)
 	$(SILENT) $(CXX) $(CXXFLAGS) -o "$@" -c "$<"
@@ -163,6 +160,9 @@ $(OBJDIR)/Scene.o: src/Scene.cc
 	@echo $(notdir $<)
 	$(SILENT) $(CXX) $(CXXFLAGS) -o "$@" -c "$<"
 $(OBJDIR)/ShaderSrc.o: src/ShaderSrc.cc
+	@echo $(notdir $<)
+	$(SILENT) $(CXX) $(CXXFLAGS) -o "$@" -c "$<"
+$(OBJDIR)/Stage.o: src/Stage.cc
 	@echo $(notdir $<)
 	$(SILENT) $(CXX) $(CXXFLAGS) -o "$@" -c "$<"
 $(OBJDIR)/Shader.o: src/utils/Shader.cc

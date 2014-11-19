@@ -1,11 +1,11 @@
-#include "Display.h"
+#include "Stage.h"
 #include "App.h"
 #include "Shader.h"
 #include "ShaderSrc.h"
 
 
 
-bool Display::init() {
+bool Stage::init() {
 	auto app = App::getInstance();
 	const int w = app->resX();
 	const int h = app->resY();
@@ -36,7 +36,7 @@ bool Display::init() {
 	return true;
 }
 
-bool Display::initScene() {
+bool Stage::initScene() {
 	
 	Sphere* s1 = new Sphere{glm::vec3(1, 3, -0.5), 2.0f};
 	s1->material().diffuse(glm::vec3{0.6, 0.3, 0.3});
@@ -51,21 +51,21 @@ bool Display::initScene() {
 	return true;
 }
 
-void Display::release() {
+void Stage::release() {
 	_rayTracer.release();
 	_result.release();
 	_scene.release();
 }
 
-void Display::update() {
+void Stage::update() {
 	
 }
 
-void Display::render() {
+void Stage::render() {
 	_result.render();
 }
 
-void Display::handleEvents(const SDL_Event& e) {
+void Stage::handleEvents(const SDL_Event& e) {
 	if (e.type == SDL_KEYDOWN || e.key.state == SDL_PRESSED) {
 		if (e.key.keysym.sym == SDLK_SPACE) {
 			_rayTracer.render(_scene, _cam);

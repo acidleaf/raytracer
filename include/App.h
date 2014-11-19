@@ -1,7 +1,7 @@
 #ifndef __App_H__
 #define __App_H__
 
-#include "Display.h"
+#include "Stage.h"
 
 class App {
 private:
@@ -11,7 +11,7 @@ private:
 	int _resX, _resY;
 	bool _done = false;
 	
-	Display _result;
+	Stage _result;
 	
 	
 	void initGL();

@@ -1,5 +1,5 @@
-#ifndef __DISPLAY_H__
-#define __DISPLAY_H__
+#ifndef __STAGE_H__
+#define __STAGE_H__
 
 #include "Surface.h"
 #include "Texture.h"
@@ -7,7 +7,7 @@
 #include "Scene.h"
 #include "Camera.h"
 
-class Display {
+class Stage {
 protected:
 	Camera _cam;
 	Scene _scene;
