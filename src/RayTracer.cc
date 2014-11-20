@@ -9,6 +9,9 @@ Ray::Ray(glm::vec3 origin, glm::vec3 direction) : _origin(origin), _direction(gl
 
 
 // Raytracer definitions
+
+const float RayTracer::EPSILON = 0.0001f;
+
 bool RayTracer::init(GLuint width, GLuint height) {
 	if (width == 0 || height == 0) return false;
 	_width = width;
@@ -67,31 +70,60 @@ void RayTracer::traceRay(const Scene& scene, const Ray& ray, glm::vec3& accColor
 	for (auto& l : primitives) {
 		if (l == prim) continue;
 		if (l->isLight()) {
-			glm::vec3 L = glm::normalize(((Sphere*)l)->centre() - intersect);
-			glm::vec3 N = prim->getNormal(intersect);
 			
+			// Ray from intersection point to light
+			glm::vec3 L = ((Sphere*)l)->centre() - intersect;
 			
-			// Calculate diffuse shading
+			// Point light falloff
+			float lDist = glm::length(L);
+			L *= (1.0f / lDist);
+			
+			// Shadows
+			// Check for each object in the scene if it blocks a ray from the current light to this intersection point
+			float shade = 1.0f;
+			for (auto& p : primitives) {
+				if (p != l && p != prim && p->intersect(Ray{intersect + L * EPSILON, L}, lDist)) {
+					shade = 0.0f;
+					break;
+				}
+			}
+			
+			// Normal at point of intersection
+			glm::vec3 N = glm::normalize(prim->getNormal(intersect));
+			
+			// Diffuse shading
 			if (prim->material().diffuseIntensity() > 0) {
 				float dotProd = glm::dot(N, L);
 				if (dotProd > 0) {
 					glm::vec3 primColor = prim->material().diffuseColor() * prim->material().diffuseIntensity();
 					glm::vec3 lightColor = l->material().diffuseColor() * l->material().diffuseIntensity();
-					accColor += dotProd * primColor * lightColor;
+					accColor += dotProd * primColor * lightColor * shade;
 				}
 			}
 			
+			// Specular shading (Phong)
+			if (prim->material().specularIntensity() > 0) {
+				glm::vec3 V = ray.direction();
+				glm::vec3 R = L - 2.0f * glm::dot(L, N) * N;
+				float dotProd = glm::dot(V, R);
+				if (dotProd > 0) {
+					float spec = std::pow(dotProd, prim->material().specularExp()) * prim->material().specularIntensity() * shade;
+					accColor += spec * prim->material().specularColor();
+				}
+			}
 		}
 	}
 	
+	// Reflection
+	// Calculate the reflected ray direction and trace it from the current intersection point
 	float refl = prim->material().reflection();
-	if (refl > 0.0f) {
+	if (refl > 0) {
 		glm::vec3 N = prim->getNormal(intersect);
-		glm::vec3 R = glm::normalize(ray.direction() - 2.0f * glm::dot(ray.direction(), N) * N);
+		glm::vec3 R = ray.direction() - 2.0f * glm::dot(ray.direction(), N) * N;
 		
 		if (bounce < TRACE_DEPTH) {
 			glm::vec3 reflCol{0};
-			traceRay(scene, Ray{intersect + R * 0.001f, R}, reflCol, bounce + 1);
+			traceRay(scene, Ray{intersect + R * EPSILON, R}, reflCol, bounce + 1);
 			accColor += refl * reflCol * prim->material().diffuseColor();
 		}
 	}

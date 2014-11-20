@@ -26,6 +26,7 @@ class Camera;
 class RayTracer {
 protected:
 	static const int TRACE_DEPTH = 6;
+	static const float EPSILON;
 	
 	GLuint _width, _height;
 	GLubyte* _resultData;

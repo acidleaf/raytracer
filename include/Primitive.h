@@ -22,12 +22,21 @@ protected:
 	glm::vec3 _diffuseColor;
 	float _diffuseIntensity = 1.0f;
 	
+	glm::vec3 _specularColor;
+	float _specularIntensity;
+	float _specularExp;
+	
 	float _reflection = 0.0f;
 	
 public:
 	void diffuse(float intensity, glm::vec3 color) { _diffuseIntensity = intensity; _diffuseColor = color; }
 	float diffuseIntensity() const { return _diffuseIntensity; }
 	glm::vec3 diffuseColor() const { return _diffuseColor; }
+	
+	void specular(float intensity, float exp, glm::vec3 color) { _specularIntensity = intensity; _specularExp = exp; _specularColor = color; }
+	float specularExp() const { return _specularExp; }
+	float specularIntensity() const { return _specularIntensity; }
+	glm::vec3 specularColor() const { return _specularColor; }
 	
 	void reflection(float intensity) { _reflection = intensity; }
 	float reflection() const { return _reflection; }
