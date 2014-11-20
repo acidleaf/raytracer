@@ -28,15 +28,17 @@ Ray Camera::rayFromPixel(GLuint x, GLuint y) const {
 	
 	//float f = focalLength();
 	glm::vec3 imgPoint = nx * _u + ny * _v + _eye + _n;
-	glm::vec3 rayDir = imgPoint - _eye;
 	
-	return Ray{imgPoint, rayDir};
+	return Ray{
+		imgPoint,
+		imgPoint - _eye
+	};
 }
 
 void Camera::calcUVN() {
 	_n = glm::normalize(_centre - _eye);
 	_u = glm::normalize(glm::cross(_n, _up));
-	_v = glm::cross(_n, _u);
+	_v = glm::normalize(glm::cross(_n, _u));
 	
 }
 

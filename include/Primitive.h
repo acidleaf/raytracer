@@ -20,13 +20,17 @@ enum HitTestResult {
 class Material {
 protected:
 	glm::vec3 _diffuseColor;
-	float _diffuseIntensity;
+	float _diffuseIntensity = 1.0f;
+	
+	float _reflection = 0.0f;
 	
 public:
 	void diffuse(float intensity, glm::vec3 color) { _diffuseIntensity = intensity; _diffuseColor = color; }
 	float diffuseIntensity() const { return _diffuseIntensity; }
 	glm::vec3 diffuseColor() const { return _diffuseColor; }
 	
+	void reflection(float intensity) { _reflection = intensity; }
+	float reflection() const { return _reflection; }
 };
 
 
@@ -83,7 +87,7 @@ protected:
 	float _d;
 	
 public:
-	Plane(glm::vec3 normal, float d) : _normal(glm::normalize(normal)), _d(d) {}
+	Plane(glm::vec3 normal, glm::vec3 p) : _normal(glm::normalize(normal)), _d(-glm::dot(_normal, p)) {}
 	HitTestResult intersect(const Ray& ray, float& dist) const;
 	glm::vec3 getNormal(const glm::vec3& p) const { return _normal; }
 	

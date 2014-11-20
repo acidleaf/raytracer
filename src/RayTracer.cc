@@ -4,7 +4,7 @@
 
 Ray::Ray() : _origin(glm::vec3(0)), _direction(glm::vec3(0)) {}
 
-Ray::Ray(glm::vec3& origin, glm::vec3& direction) : _origin(origin), _direction(direction) {}
+Ray::Ray(glm::vec3 origin, glm::vec3 direction) : _origin(origin), _direction(glm::normalize(direction)) {}
 
 
 
@@ -39,39 +39,40 @@ void RayTracer::setPixel(GLuint x, GLuint y, glm::vec3 color) {
 	_resultData[i + 2] = b;
 }
 
-void RayTracer::traceRay(const Scene& scene, const Ray& ray, glm::vec3& accColor) {
-	bool hit = false;
-	float dist = 100000000.0f;
+void RayTracer::traceRay(const Scene& scene, const Ray& ray, glm::vec3& accColor, int bounce) {
+	float depth = 100000.0f;
 	Primitive* prim = nullptr;
 	auto primitives = scene.primitives();
 	
 	// Find nearest primitive
 	for (auto& p : primitives) {
-		HitTestResult res = p->intersect(ray, dist);
+		HitTestResult res = p->intersect(ray, depth);
 		if (res == HitTestResult::HIT) {
-			hit = true;
 			prim = p;
 		}
 	}
 	
-	//if (hit) accColor = nearestPrim->material().diffuse();
 	
-	///*
-	if (hit) {
-		// Set the light color if it's a light
-		if (prim->isLight()) {
-			accColor = prim->material().diffuseColor() * prim->material().diffuseIntensity();
-			return;
-		}
-		
-		// Trace the lights
-		glm::vec3 intersect = ray.origin() + ray.direction() * dist;
-		for (auto& l : primitives) {
-			if (l == prim) continue;
-			if (l->isLight()) {
-				glm::vec3 L = glm::normalize(((Sphere*)l)->centre() - intersect);
-				glm::vec3 N = prim->getNormal(intersect);
-				
+	if (!prim) return;
+	
+	
+	// Set the light color if it's a light
+	if (prim->isLight()) {
+		accColor = prim->material().diffuseColor() * prim->material().diffuseIntensity();
+		return;
+	}
+	
+	// Trace the lights
+	glm::vec3 intersect = ray.origin() + ray.direction() * depth;
+	for (auto& l : primitives) {
+		if (l == prim) continue;
+		if (l->isLight()) {
+			glm::vec3 L = glm::normalize(((Sphere*)l)->centre() - intersect);
+			glm::vec3 N = prim->getNormal(intersect);
+			
+			
+			// Calculate diffuse shading
+			if (prim->material().diffuseIntensity() > 0) {
 				float dotProd = glm::dot(N, L);
 				if (dotProd > 0) {
 					glm::vec3 primColor = prim->material().diffuseColor() * prim->material().diffuseIntensity();
@@ -79,9 +80,23 @@ void RayTracer::traceRay(const Scene& scene, const Ray& ray, glm::vec3& accColor
 					accColor += dotProd * primColor * lightColor;
 				}
 			}
+			
 		}
 	}
-	//*/
+	
+	float refl = prim->material().reflection();
+	if (refl > 0.0f) {
+		glm::vec3 N = prim->getNormal(intersect);
+		glm::vec3 R = glm::normalize(ray.direction() - 2.0f * glm::dot(ray.direction(), N) * N);
+		
+		if (bounce < TRACE_DEPTH) {
+			glm::vec3 reflCol{0};
+			traceRay(scene, Ray{intersect + R * 0.001f, R}, reflCol, bounce + 1);
+			accColor += refl * reflCol * prim->material().diffuseColor();
+		}
+	}
+	
+	
 }
 
 void RayTracer::render(const Scene& scene, const Camera& cam) {
@@ -92,7 +107,7 @@ void RayTracer::render(const Scene& scene, const Camera& cam) {
 			Ray ray = cam.rayFromPixel(j, i);
 			glm::vec3 accColor{0};
 			
-			traceRay(scene, ray, accColor);
+			traceRay(scene, ray, accColor, 0);
 			
 			setPixel(j, i, accColor);
 		}

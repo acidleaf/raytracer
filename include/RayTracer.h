@@ -11,7 +11,7 @@ protected:
 	glm::vec3 _origin, _direction;
 public:
 	Ray();
-	Ray(glm::vec3& origin, glm::vec3& direction);
+	Ray(glm::vec3 origin, glm::vec3 direction);
 	glm::vec3 origin() const { return _origin; }
 	glm::vec3 direction() const { return _direction; }
 };
@@ -25,12 +25,14 @@ class Camera;
 
 class RayTracer {
 protected:
+	static const int TRACE_DEPTH = 6;
+	
 	GLuint _width, _height;
 	GLubyte* _resultData;
 	
 	void setPixel(GLuint x, GLuint y, glm::vec3 color);
 	
-	void traceRay(const Scene& scene, const Ray& ray, glm::vec3& acc);
+	void traceRay(const Scene& scene, const Ray& ray, glm::vec3& acc, int bounce);
 	
 public:
 	bool init(GLuint width, GLuint height);

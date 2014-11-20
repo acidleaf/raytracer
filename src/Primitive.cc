@@ -5,6 +5,7 @@
 ////////////////////////////////////////
 HitTestResult Sphere::intersect(const Ray& ray, float& dist) const {
 	
+	//*
 	glm::vec3 rayToSphere = _centre - ray.origin();
 	
 	
@@ -24,12 +25,16 @@ HitTestResult Sphere::intersect(const Ray& ray, float& dist) const {
 					return HitTestResult::HIT;
 				}
 			} else {
-				//float hitDist = glm::length(projCentre - ray.origin()) + d;
-				return HitTestResult::INSIDE;
+				float hitDist = glm::length(projCentre - ray.origin()) + d;
+				if (hitDist < dist) {
+					//dist = hitDist;
+					return HitTestResult::INSIDE;
+				}
+				
 			}
 		}
 	}
-	
+	//*/
 	return HitTestResult::MISS;
 }
 glm::vec3 Sphere::getNormal(const glm::vec3& p) const {
@@ -43,7 +48,7 @@ glm::vec3 Sphere::getNormal(const glm::vec3& p) const {
 HitTestResult Plane::intersect(const Ray& ray, float& dist) const {
 	float d = glm::dot(ray.direction(), _normal);
 	if (d != 0) {
-		float hitDist = -glm::dot(_normal, ray.origin()) + _d / d;
+		float hitDist = -(glm::dot(_normal, ray.origin()) + _d) / d;
 		if (hitDist >= 0) {
 			if (hitDist < dist) {
 				dist = hitDist;
