@@ -1,8 +1,10 @@
 #include "Primitive.h"
 
-HitTestResult Sphere::intersect(Ray& ray, float& dist) const {
+////////////////////////////////////////
+// Sphere definitions
+////////////////////////////////////////
+HitTestResult Sphere::intersect(const Ray& ray, float& dist) const {
 	
-	HitTestResult res = HitTestResult::MISS;
 	glm::vec3 rayToSphere = _centre - ray.origin();
 	
 	
@@ -16,20 +18,38 @@ HitTestResult Sphere::intersect(Ray& ray, float& dist) const {
 			
 			
 			if (glm::length(rayToSphere) >= _radius) {
-				dist = glm::length(projCentre - ray.origin()) - d;
-				res = HitTestResult::HIT;
+				float hitDist = glm::length(projCentre - ray.origin()) - d;
+				if (hitDist < dist) {
+					dist = hitDist;
+					return HitTestResult::HIT;
+				}
 			} else {
-				dist = glm::length(projCentre - ray.origin()) + d;
-				res = HitTestResult::INSIDE;
+				//float hitDist = glm::length(projCentre - ray.origin()) + d;
+				return HitTestResult::INSIDE;
 			}
-			
-			// The intersection point
-			//glm::vec3 intersect = ray.origin() + ray.direction() * dist;
 		}
 	}
 	
-	return res;
+	return HitTestResult::MISS;
 }
 glm::vec3 Sphere::getNormal(const glm::vec3& p) const {
 	return (p - _centre) * _radius;
+}
+
+
+////////////////////////////////////////
+// Plane definitions
+////////////////////////////////////////
+HitTestResult Plane::intersect(const Ray& ray, float& dist) const {
+	float d = glm::dot(ray.direction(), _normal);
+	if (d != 0) {
+		float hitDist = -glm::dot(_normal, ray.origin()) + _d / d;
+		if (hitDist >= 0) {
+			if (hitDist < dist) {
+				dist = hitDist;
+				return HitTestResult::HIT;
+			}
+		}
+	}
+	return HitTestResult::MISS;
 }

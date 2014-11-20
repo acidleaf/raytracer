@@ -19,11 +19,13 @@ enum HitTestResult {
 ////////////////////////////////////////
 class Material {
 protected:
-	glm::vec3 _diffuse;
+	glm::vec3 _diffuseColor;
+	float _diffuseIntensity;
 	
 public:
-	void diffuse(glm::vec3 diffuse) { _diffuse = diffuse; }
-	glm::vec3 diffuse() { return _diffuse; }
+	void diffuse(float intensity, glm::vec3 color) { _diffuseIntensity = intensity; _diffuseColor = color; }
+	float diffuseIntensity() const { return _diffuseIntensity; }
+	glm::vec3 diffuseColor() const { return _diffuseColor; }
 	
 };
 
@@ -39,7 +41,7 @@ protected:
 public:
 	virtual ~Primitive() {}
 	
-	virtual HitTestResult intersect(Ray& ray, float& dist) const = 0;
+	virtual HitTestResult intersect(const Ray& ray, float& dist) const = 0;
 	virtual glm::vec3 getNormal(const glm::vec3& p) const = 0; 
 	
 	Material& material() { return _material; }
@@ -63,8 +65,29 @@ public:
 	~Sphere() {}
 	
 	Sphere(glm::vec3 centre, float radius) : _centre(centre), _radius(radius) {}
-	HitTestResult intersect(Ray& ray, float& dist) const;
+	HitTestResult intersect(const Ray& ray, float& dist) const;
 	glm::vec3 getNormal(const glm::vec3& p) const;
+	
+	glm::vec3 centre() const { return _centre; }
+	float radius() const { return _radius; }
+};
+
+
+
+////////////////////////////////////////
+// Plane primitive
+////////////////////////////////////////
+class Plane : public Primitive {
+protected:
+	glm::vec3 _normal;
+	float _d;
+	
+public:
+	Plane(glm::vec3 normal, float d) : _normal(glm::normalize(normal)), _d(d) {}
+	HitTestResult intersect(const Ray& ray, float& dist) const;
+	glm::vec3 getNormal(const glm::vec3& p) const { return _normal; }
+	
+	float d() const { return _d; }
 };
 
 #endif

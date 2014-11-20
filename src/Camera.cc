@@ -23,10 +23,8 @@ GLfloat Camera::focalLength() const {
 }
 
 Ray Camera::rayFromPixel(GLuint x, GLuint y) const {
-	float nx = (x / (float)_imgW) - 0.5f;
+	float nx = ((x / (float)_imgW) - 0.5f) * _aspectRatio;
 	float ny = (y / (float)_imgH) - 0.5f;
-	
-	nx *= _aspectRatio;
 	
 	//float f = focalLength();
 	glm::vec3 imgPoint = nx * _u + ny * _v + _eye + _n;
@@ -38,7 +36,7 @@ Ray Camera::rayFromPixel(GLuint x, GLuint y) const {
 void Camera::calcUVN() {
 	_n = glm::normalize(_centre - _eye);
 	_u = glm::normalize(glm::cross(_n, _up));
-	_v = glm::cross(_u, _n);
+	_v = glm::cross(_n, _u);
 	
 }
 

@@ -29,14 +29,59 @@ void RayTracer::release() {
 void RayTracer::setPixel(GLuint x, GLuint y, glm::vec3 color) {
 	const int bpp = 3;
 	
-	GLubyte r = color.x * 255;
-	GLubyte g = color.y * 255;
-	GLubyte b = color.z * 255;
+	GLubyte r = std::min(255, (int)(color.x * 256));
+	GLubyte g = std::min(255, (int)(color.y * 256));
+	GLubyte b = std::min(255, (int)(color.z * 256));
 	
 	const int i = (x * bpp) + y * (_width * bpp);
 	_resultData[i + 0] = r;
 	_resultData[i + 1] = g;
 	_resultData[i + 2] = b;
+}
+
+void RayTracer::traceRay(const Scene& scene, const Ray& ray, glm::vec3& accColor) {
+	bool hit = false;
+	float dist = 100000000.0f;
+	Primitive* prim = nullptr;
+	auto primitives = scene.primitives();
+	
+	// Find nearest primitive
+	for (auto& p : primitives) {
+		HitTestResult res = p->intersect(ray, dist);
+		if (res == HitTestResult::HIT) {
+			hit = true;
+			prim = p;
+		}
+	}
+	
+	//if (hit) accColor = nearestPrim->material().diffuse();
+	
+	///*
+	if (hit) {
+		// Set the light color if it's a light
+		if (prim->isLight()) {
+			accColor = prim->material().diffuseColor() * prim->material().diffuseIntensity();
+			return;
+		}
+		
+		// Trace the lights
+		glm::vec3 intersect = ray.origin() + ray.direction() * dist;
+		for (auto& l : primitives) {
+			if (l == prim) continue;
+			if (l->isLight()) {
+				glm::vec3 L = glm::normalize(((Sphere*)l)->centre() - intersect);
+				glm::vec3 N = prim->getNormal(intersect);
+				
+				float dotProd = glm::dot(N, L);
+				if (dotProd > 0) {
+					glm::vec3 primColor = prim->material().diffuseColor() * prim->material().diffuseIntensity();
+					glm::vec3 lightColor = l->material().diffuseColor() * l->material().diffuseIntensity();
+					accColor += dotProd * primColor * lightColor;
+				}
+			}
+		}
+	}
+	//*/
 }
 
 void RayTracer::render(const Scene& scene, const Camera& cam) {
@@ -45,33 +90,11 @@ void RayTracer::render(const Scene& scene, const Camera& cam) {
 		for (int j = 0; j < _width; ++j) {
 			
 			Ray ray = cam.rayFromPixel(j, i);
+			glm::vec3 accColor{0};
 			
-			bool hit = false;
-			float nearestDist = 100000000.0f;
-			Primitive* nearestPrim = nullptr;
-			auto primitives = scene.primitives();
+			traceRay(scene, ray, accColor);
 			
-			// Find nearest primitive
-			for (auto& p : primitives) {
-				float dist;
-				HitTestResult res = p->intersect(ray, dist);
-				if (res == HitTestResult::HIT) {
-					hit = true;
-					if (dist < nearestDist) {
-						nearestDist = dist;
-						nearestPrim = p;
-					}
-				}
-			}
-			
-			
-			// Get color of the primitive
-			if (hit) {
-				//glm::vec3 intersect = ray.origin() + ray.direction() * nearestDist;
-				setPixel(j, i, nearestPrim->material().diffuse());
-			}
-			
-			
+			setPixel(j, i, accColor);
 		}
 	}
 	//*/
