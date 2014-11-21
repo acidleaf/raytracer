@@ -28,6 +28,9 @@ protected:
 	
 	float _reflection = 0.0f;
 	
+	float _refraction = 0.0f;
+	float _refractiveIndex = 1.0f;
+	
 public:
 	void diffuse(float intensity, glm::vec3 color) { _diffuseIntensity = intensity; _diffuseColor = color; }
 	float diffuseIntensity() const { return _diffuseIntensity; }
@@ -40,6 +43,10 @@ public:
 	
 	void reflection(float intensity) { _reflection = intensity; }
 	float reflection() const { return _reflection; }
+	
+	void refraction(float intensity, float index) { _refraction = intensity; _refractiveIndex = index; }
+	float refraction() const { return _refraction; }
+	float refractiveIndex() const { return _refractiveIndex; }
 };
 
 

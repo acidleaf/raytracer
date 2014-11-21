@@ -22,6 +22,7 @@ public:
 
 class Scene;
 class Camera;
+class Primitive;
 
 class RayTracer {
 protected:
@@ -33,7 +34,7 @@ protected:
 	
 	void setPixel(GLuint x, GLuint y, glm::vec3 color);
 	
-	void traceRay(const Scene& scene, const Ray& ray, glm::vec3& acc, int bounce);
+	Primitive* traceRay(const Scene& scene, const Ray& ray, glm::vec3& acc, float& depth, float rIndex, int bounce);
 	
 public:
 	bool init(GLuint width, GLuint height);

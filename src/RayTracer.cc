@@ -42,27 +42,35 @@ void RayTracer::setPixel(GLuint x, GLuint y, glm::vec3 color) {
 	_resultData[i + 2] = b;
 }
 
-void RayTracer::traceRay(const Scene& scene, const Ray& ray, glm::vec3& accColor, int bounce) {
-	float depth = 100000.0f;
+Primitive* RayTracer::traceRay(const Scene& scene, const Ray& ray, glm::vec3& accColor, float& depth, float rIndex, int bounce) {
+	if (bounce > TRACE_DEPTH) return nullptr;
+	
+	depth = 100000.0f;
 	Primitive* prim = nullptr;
 	auto primitives = scene.primitives();
 	
+	HitTestResult result = HitTestResult::MISS;
+	
 	// Find nearest primitive
 	for (auto& p : primitives) {
+		
+		if (p->isLight()) continue;
+		
 		HitTestResult res = p->intersect(ray, depth);
 		if (res == HitTestResult::HIT) {
 			prim = p;
+			result = res;
 		}
 	}
 	
 	
-	if (!prim) return;
+	if (!prim) return prim;
 	
 	
 	// Set the light color if it's a light
 	if (prim->isLight()) {
 		accColor = prim->material().diffuseColor() * prim->material().diffuseIntensity();
-		return;
+		return prim;
 	}
 	
 	// Trace the lights
@@ -82,7 +90,7 @@ void RayTracer::traceRay(const Scene& scene, const Ray& ray, glm::vec3& accColor
 			// Check for each object in the scene if it blocks a ray from the current light to this intersection point
 			float shade = 1.0f;
 			for (auto& p : primitives) {
-				if (p != l && p != prim && p->intersect(Ray{intersect + L * EPSILON, L}, lDist)) {
+				if (p != l && p != prim && !p->isLight() && p->intersect(Ray{intersect + L * EPSILON, L}, lDist)) {
 					shade = 0.0f;
 					break;
 				}
@@ -123,12 +131,42 @@ void RayTracer::traceRay(const Scene& scene, const Ray& ray, glm::vec3& accColor
 		
 		if (bounce < TRACE_DEPTH) {
 			glm::vec3 reflCol{0};
-			traceRay(scene, Ray{intersect + R * EPSILON, R}, reflCol, bounce + 1);
+			float dist;
+			traceRay(scene, Ray{intersect + R * EPSILON, R}, reflCol, dist, rIndex, bounce + 1);
 			accColor += refl * reflCol * prim->material().diffuseColor();
 		}
 	}
 	
 	
+	// Refraction
+	float refr = prim->material().refraction();
+	if (refr > 0 && bounce < TRACE_DEPTH) {
+		float ri = prim->material().refractiveIndex();
+		float n = rIndex / ri;
+		
+		glm::vec3 N = prim->getNormal(intersect) * (float)result;
+		
+		float cosI = -glm::dot(N, ray.direction());
+		float cosT2 = 1.0f - n * n * (1.0f - cosI * cosI);
+		
+		if (cosT2 > 0.0f) {
+			glm::vec3 T = (n * ray.direction()) + (n * cosI - std::sqrt(cosT2)) * N;
+			glm::vec3 refrCol{0};
+			float dist;
+			traceRay(scene, Ray{intersect + T * EPSILON, T}, refrCol, dist, ri, bounce + 1);
+			
+			glm::vec3 absorbance = prim->material().diffuseColor() * 0.15f * dist;
+			glm::vec3 transparency{
+				std::exp(absorbance.x),
+				std::exp(absorbance.y),
+				std::exp(absorbance.z)
+			};
+			
+			
+			accColor += refrCol * transparency;
+		}
+	}
+	return prim;
 }
 
 void RayTracer::render(const Scene& scene, const Camera& cam) {
@@ -138,8 +176,8 @@ void RayTracer::render(const Scene& scene, const Camera& cam) {
 			
 			Ray ray = cam.rayFromPixel(j, i);
 			glm::vec3 accColor{0};
-			
-			traceRay(scene, ray, accColor, 0);
+			float depth;
+			traceRay(scene, ray, accColor, depth, 1.0f, 0);
 			
 			setPixel(j, i, accColor);
 		}
