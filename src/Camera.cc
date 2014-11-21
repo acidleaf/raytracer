@@ -22,7 +22,7 @@ GLfloat Camera::focalLength() const {
 	return 0.5f / tan(glm::radians(_fov * 0.5f));
 }
 
-Ray Camera::rayFromPixel(GLuint x, GLuint y) const {
+Ray Camera::rayFromPixel(GLuint x, GLuint y, GLfloat dx, GLfloat dy) const {
 	float nx = ((x / (float)_imgW) - 0.5f) * _aspectRatio;
 	float ny = (y / (float)_imgH) - 0.5f;
 	
@@ -31,7 +31,7 @@ Ray Camera::rayFromPixel(GLuint x, GLuint y) const {
 	
 	return Ray{
 		imgPoint,
-		imgPoint - _eye
+		(imgPoint - _eye) + glm::vec3{dx, dy, 0.0f}
 	};
 }
 

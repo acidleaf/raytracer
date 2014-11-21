@@ -17,6 +17,8 @@ bool RayTracer::init(GLuint width, GLuint height) {
 	_width = width;
 	_height = height;
 	
+	_dx = (1.0f / _width) * ((float)_width / (float)_height);
+	_dy = 1.0f / _height;
 	
 	const int dataSize = _width * _height * 3;
 	_resultData = new GLubyte[dataSize];
@@ -170,18 +172,32 @@ Primitive* RayTracer::traceRay(const Scene& scene, const Ray& ray, glm::vec3& ac
 }
 
 void RayTracer::render(const Scene& scene, const Camera& cam) {
-	//*
+	Primitive* lastPrim = nullptr;
+	const bool supersampling = true;
+	
 	for (int i = 0; i < _height; ++i) {
 		for (int j = 0; j < _width; ++j) {
 			
-			Ray ray = cam.rayFromPixel(j, i);
 			glm::vec3 accColor{0};
+			Ray ray = cam.rayFromPixel(j, i);
 			float depth;
-			traceRay(scene, ray, accColor, depth, 1.0f, 0);
+			Primitive* p = traceRay(scene, ray, accColor, depth, 1.0f, 0);
 			
-			setPixel(j, i, accColor);
+			if (p != lastPrim && supersampling) {
+				lastPrim = p;
+				for (int ty = -1; ty < 2; ++ty) {
+					for (int tx = -1; tx < 2; ++tx) {
+						Ray ray = cam.rayFromPixel(j, i, tx * _dx, ty * _dy);
+						traceRay(scene, ray, accColor, depth, 1.0f, 0);
+					}
+				}
+				setPixel(j, i, accColor / 9.0f);
+			} else {
+				setPixel(j, i, accColor);
+			}
+			
+			
+			
 		}
 	}
-	//*/
-	
 }

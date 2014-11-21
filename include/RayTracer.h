@@ -32,6 +32,8 @@ protected:
 	GLuint _width, _height;
 	GLubyte* _resultData;
 	
+	float _dx, _dy;
+	
 	void setPixel(GLuint x, GLuint y, glm::vec3 color);
 	
 	Primitive* traceRay(const Scene& scene, const Ray& ray, glm::vec3& acc, float& depth, float rIndex, int bounce);

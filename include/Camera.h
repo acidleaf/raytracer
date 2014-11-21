@@ -19,7 +19,7 @@ public:
 	
 	bool init(GLuint imgW, GLuint imgH, GLfloat fov, glm::vec3 eye, glm::vec3 centre, glm::vec3 up);
 	
-	Ray rayFromPixel(GLuint x, GLuint y) const;
+	Ray rayFromPixel(GLuint x, GLuint y, GLfloat dx = 0.0f, GLfloat dy = 0.0f) const;
 	
 	GLfloat focalLength() const;
 	
