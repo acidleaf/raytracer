@@ -165,7 +165,7 @@ Primitive* RayTracer::traceRay(const Scene& scene, const Ray& ray, glm::vec3& ac
 			};
 			
 			
-			accColor += refrCol * transparency;
+			accColor += refrCol;
 		}
 	}
 	return prim;
@@ -173,7 +173,7 @@ Primitive* RayTracer::traceRay(const Scene& scene, const Ray& ray, glm::vec3& ac
 
 void RayTracer::render(const Scene& scene, const Camera& cam) {
 	Primitive* lastPrim = nullptr;
-	const bool supersampling = true;
+	const bool supersampling = false;
 	
 	for (int i = 0; i < _height; ++i) {
 		for (int j = 0; j < _width; ++j) {
