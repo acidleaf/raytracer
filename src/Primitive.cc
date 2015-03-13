@@ -42,6 +42,52 @@ glm::vec3 Sphere::getNormal(const glm::vec3& p) const {
 }
 
 
+
+////////////////////////////////////////
+// Triangle definitions
+////////////////////////////////////////
+Triangle::Triangle(glm::vec3 v1, glm::vec3 v2, glm::vec3 v3) : _v1(v1), _v2(v2), _v3(v3) {
+	_normal = glm::normalize(glm::cross(_v2 - _v1, _v3 - _v1));
+}
+HitTestResult Triangle::intersect(const Ray& ray, float& dist) const {
+	const float EPSILON = 0.000001f;
+	glm::vec3 e1, e2;
+	glm::vec3 P, Q, T;
+	float det, invDet, u, v;
+	float t;
+	
+	e1 = _v2 - _v1;
+	e2 = _v3 - _v1;
+	
+	
+	P = glm::cross(ray.direction(), e2);
+	det = glm::dot(e1, P);
+	
+	if (det > -EPSILON && det < EPSILON) return HitTestResult::MISS;
+	invDet = 1.0f / det;
+	
+	T = ray.origin() - _v1;
+	u = glm::dot(T, P) * invDet;
+	if (u < 0.0f || u > 1.0f) return HitTestResult::MISS;
+	
+	
+	Q = glm::cross(T, e1);
+	v = glm::dot(ray.direction(), Q) * invDet;
+	if (v < 0.0f || u + v > 1.0f) return HitTestResult::MISS;
+	
+	
+	t = glm::dot(e2, Q) * invDet;
+	if (abs(t) > EPSILON) {
+		dist = t;
+		return HitTestResult::HIT;
+	}
+	
+	return HitTestResult::MISS;
+}
+
+
+
+
 ////////////////////////////////////////
 // Plane definitions
 ////////////////////////////////////////

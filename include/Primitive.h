@@ -93,6 +93,21 @@ public:
 };
 
 
+////////////////////////////////////////
+// Triangle primitive
+////////////////////////////////////////
+class Triangle : public Primitive {
+protected:
+	glm::vec3 _v1, _v2, _v3;
+	glm::vec3 _normal;
+	
+public:
+	Triangle(glm::vec3 v1, glm::vec3 v2, glm::vec3 v3);
+	HitTestResult intersect(const Ray& ray, float& dist) const;
+	glm::vec3 getNormal(const glm::vec3& p) const { return _normal; }
+};
+
+
 
 ////////////////////////////////////////
 // Plane primitive

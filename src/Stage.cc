@@ -76,8 +76,14 @@ bool Stage::initScene() {
 	_scene.addPrimitive(light2);
 	
 	
+	Triangle* tri = new Triangle{glm::vec3(-1, 9, -3), glm::vec3(1, 9, 5), glm::vec3(0, 11, 4)};
+	tri->material().diffuse(0.3f, glm::vec3(1.0f, 0.0f, 1.0f));
+	_scene.addPrimitive(tri);
+	
+	
+	/*
 	Sphere* s1 = new Sphere{glm::vec3(-1, 10, 0), 0.5f};
-	s1->material().diffuse(0.8f, glm::vec3{0, 1, 0});
+	s1->material().diffuse(0.8f, glm::vec3{1, 0, 0});
 	s1->material().specular(0.8f, 50, glm::vec3(1.0));
 	_scene.addPrimitive(s1);
 	
@@ -87,21 +93,21 @@ bool Stage::initScene() {
 	_scene.addPrimitive(s2);
 	
 	Sphere* s3 = new Sphere{glm::vec3(1, 8, 0), 0.5f};
-	s3->material().diffuse(0.8f, glm::vec3{0, 1, 0});
+	s3->material().diffuse(0.8f, glm::vec3{0, 1, 1});
 	s3->material().specular(0.8f, 50, glm::vec3(1.0));
 	_scene.addPrimitive(s3);
 	
 	Sphere* s4 = new Sphere{glm::vec3(-1, 8, 0), 0.5f};
-	s4->material().diffuse(0.8f, glm::vec3{0, 1, 0});
+	s4->material().diffuse(0.8f, glm::vec3{1, 1, 0});
 	s4->material().specular(0.8f, 50, glm::vec3(1.0));
 	_scene.addPrimitive(s4);
 	
 	Sphere* big = new Sphere{glm::vec3(0, 9, 10), 2.0f};
-	big->material().diffuse(1.0f, {1.0f, 0.0f, 0.0f});
+	big->material().diffuse(1.0f, {1.0f, 1.0f, 1.0f});
 	big->material().refraction(1.0f, 1.5f);
 	big->material().specular(0.8f, 500, glm::vec3(1.0));
 	_scene.addPrimitive(big);
-	
+	*/
 	/*
 	Sphere* s1 = new Sphere{glm::vec3(-1.2, 1, 0), 1.0f};
 	s1->material().diffuse(1.0f, glm::vec3{1, 1, 0});
