@@ -1,7 +1,7 @@
 #ifndef __RAYTRACER_H__
 #define __RAYTRACER_H__
 
-
+#include "pch.hpp"
 #include <glm/glm.hpp>
 
 

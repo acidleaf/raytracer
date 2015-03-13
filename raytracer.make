@@ -22,17 +22,14 @@ endif
 ifeq ($(config),debug)
   OBJDIR     = obj/Debug
   TARGETDIR  = bin/Debug
-  TARGET     = $(TARGETDIR)/raytracer
+  TARGET     = $(TARGETDIR)/raytracer.exe
   DEFINES   += 
-  INCLUDES  += -Iinclude -Iinclude/utils -I/usr/local/include
+  INCLUDES  += -Iinclude -Iinclude/utils -ID:/Lib/SDL/i686-w64-mingw32/include -ID:/Lib/glew/include -ID:/Lib/glm
   CPPFLAGS  += -MMD -MP $(DEFINES) $(INCLUDES)
-  PCH        = include/pch.hpp
-  GCH        = $(OBJDIR)/pch.hpp.gch
-  CPPFLAGS  += -I$(OBJDIR) -include $(OBJDIR)/pch.hpp
-  CFLAGS    += $(CPPFLAGS) $(ARCH) -g --std=c++11 -Wall
+  CFLAGS    += $(CPPFLAGS) $(ARCH) -g --std=c++11 -Wall -mconsole
   CXXFLAGS  += $(CFLAGS) 
-  LDFLAGS   += -framework OpenGL -L/usr/local/lib
-  LIBS      += -lSDL2 -lglew
+  LDFLAGS   += -LD:/Lib/SDL/i686-w64-mingw32/lib -LD:/Lib/glew/lib
+  LIBS      += -lmingw32 -lopengl32 -lSDL2main -lSDL2 -lglew32
   RESFLAGS  += $(DEFINES) $(INCLUDES) 
   LDDEPS    += 
   LINKCMD    = $(CXX) -o $(TARGET) $(OBJECTS) $(LDFLAGS) $(RESOURCES) $(ARCH) $(LIBS)
@@ -47,17 +44,14 @@ endif
 ifeq ($(config),release)
   OBJDIR     = obj/Release
   TARGETDIR  = bin/Release
-  TARGET     = $(TARGETDIR)/raytracer
+  TARGET     = $(TARGETDIR)/raytracer.exe
   DEFINES   += 
-  INCLUDES  += -Iinclude -Iinclude/utils -I/usr/local/include
+  INCLUDES  += -Iinclude -Iinclude/utils -ID:/Lib/SDL/i686-w64-mingw32/include -ID:/Lib/glew/include -ID:/Lib/glm
   CPPFLAGS  += -MMD -MP $(DEFINES) $(INCLUDES)
-  PCH        = include/pch.hpp
-  GCH        = $(OBJDIR)/pch.hpp.gch
-  CPPFLAGS  += -I$(OBJDIR) -include $(OBJDIR)/pch.hpp
   CFLAGS    += $(CPPFLAGS) $(ARCH) -O2 --std=c++11
   CXXFLAGS  += $(CFLAGS) 
-  LDFLAGS   += -Wl,-x -framework OpenGL -L/usr/local/lib
-  LIBS      += -lSDL2 -lglew
+  LDFLAGS   += -s -LD:/Lib/SDL/i686-w64-mingw32/lib -LD:/Lib/glew/lib
+  LIBS      += -lmingw32 -lopengl32 -lSDL2main -lSDL2 -lglew32
   RESFLAGS  += $(DEFINES) $(INCLUDES) 
   LDDEPS    += 
   LINKCMD    = $(CXX) -o $(TARGET) $(OBJECTS) $(LDFLAGS) $(RESOURCES) $(ARCH) $(LIBS)
